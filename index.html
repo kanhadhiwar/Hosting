@@ -3,90 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cloud Host Pro | Search Enabled</title>
+    <title>Cloud Host Pro | Email Login</title>
     <style>
         :root { --accent: #ff4757; --bg: #0b0f1a; --card: #1e293b; --text: #f8fafc; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
         body { font-family: sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
 
-        /* Header */
-        .header { background: #111827; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; }
-        .brand { font-weight: bold; color: var(--accent); font-size: 1.1rem; }
+        /* Auth Screen */
+        #auth-screen { position: fixed; inset: 0; background: var(--bg); z-index: 20000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 25px; }
+        .auth-container { width: 100%; max-width: 320px; background: var(--card); padding: 20px; border-radius: 15px; border: 1px solid #334155; }
+        .auth-input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; outline: none; }
+        .auth-btn { width: 100%; padding: 12px; margin-top: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; }
+        .login-primary { background: var(--accent); color: white; }
+        .signup-secondary { background: #334155; color: white; font-size: 12px; margin-top: 15px; }
 
-        /* Workspace */
-        .workspace { flex: 1; position: relative; display: flex; flex-direction: column; }
-        textarea { flex: 1; background: #020617; color: #94a3b8; border: none; padding: 15px; font-family: monospace; outline: none; font-size: 14px; width: 100%; }
+        /* Main UI */
+        .header { background: #111827; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; }
+        .workspace { flex: 1; display: flex; flex-direction: column; }
+        textarea { flex: 1; background: #020617; color: #94a3b8; border: none; padding: 15px; font-family: monospace; outline: none; font-size: 14px; width: 100%; resize: none; }
         #preview-box { flex: 1; background: white; display: none; }
         iframe { width: 100%; height: 100%; border: none; }
 
-        /* Bottom Menu */
-        .bottom-nav { background: #111827; padding: 12px; display: flex; gap: 8px; border-top: 1px solid #1e293b; z-index: 10; }
-        .btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; color: white; font-size: 13px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .bottom-nav { background: #111827; padding: 12px; display: flex; gap: 8px; border-top: 1px solid #1e293b; }
+        .btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; color: white; font-size: 13px; cursor: pointer; }
         .btn-menu { background: #334155; flex: 0.25; }
         .btn-run { background: #2563eb; }
         .btn-save { background: var(--accent); }
 
-        /* History Overlay & Search */
+        /* Overlays */
         .history-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0b1120; z-index: 9999; display: none; flex-direction: column; }
         .history-header { padding: 15px; border-bottom: 1px solid #1e293b; }
-        .search-box { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: white; margin-top: 10px; outline: none; font-size: 14px; }
+        .search-box { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: white; margin: 10px 0; outline: none; }
         .history-content { flex: 1; overflow-y: auto; padding: 15px; }
-        
-        /* Cards */
-        .hist-card { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #334155; }
-        .hist-info { flex: 1; overflow: hidden; cursor: pointer; }
-        .hist-info b { display: block; font-size: 15px; color: #fff; text-transform: capitalize; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .hist-info small { color: #94a3b8; font-size: 11px; }
-
-        .actions { display: flex; gap: 8px; margin-left: 10px; }
-        .action-btn { border: none; border-radius: 6px; padding: 10px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; }
-        .copy-btn { background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); }
-        .del-btn { background: rgba(255, 71, 87, 0.1); color: #ff4757; border: 1px solid rgba(255, 71, 87, 0.2); }
-
-        #share-status { background: #059669; padding: 10px; font-size: 11px; text-align: center; display: none; }
+        .hist-card { background: var(--card); padding: 12px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #334155; }
     </style>
 </head>
 <body>
 
-<div id="editor-ui">
-    <div class="header">
-        <div class="brand">HOST PRO v4</div>
-        <div style="font-size: 10px; color: #10b981;">● ONLINE</div>
+<div id="auth-screen">
+    <div class="auth-container">
+        <h2 style="color:var(--accent); text-align:center; margin-bottom:15px;">Host Pro Login</h2>
+        <input type="email" id="email" class="auth-input" placeholder="Email Address">
+        <input type="password" id="password" class="auth-input" placeholder="Password">
+        <button id="btnLogin" class="auth-btn login-primary">LOGIN</button>
+        <button id="btnSignup" class="auth-btn signup-secondary">Naya Account Banayein (Sign Up)</button>
+        <p id="auth-msg" style="font-size:11px; color:#ff4757; margin-top:10px; text-align:center;"></p>
     </div>
+</div>
 
-    <div id="share-status">
-        URL: <span id="link-url"></span> | <button onclick="copyCurrentLink()" style="padding:2px 5px; border:none; border-radius:3px; background:#fff; font-weight:bold;">COPY</button>
+<div id="main-app" style="display:none; height:100vh; flex-direction:column;">
+    <div class="header">
+        <div style="font-weight:bold; color:var(--accent);">HOST PRO v6</div>
+        <div id="user-display" style="font-size:11px; color:#94a3b8;">
+            <span id="user-email"></span> | <b onclick="logoutUser()" style="color:var(--accent)">Logout</b>
+        </div>
     </div>
 
     <div class="workspace">
-        <textarea id="editor" placeholder="Apna code likhein..."></textarea>
+        <textarea id="editor" placeholder="Code likhna shuru karein..."></textarea>
         <div id="preview-box"><iframe id="preview-frame"></iframe></div>
     </div>
 
     <div class="bottom-nav">
-        <button class="btn btn-menu" onclick="openHistory()">☰</button>
-        <button class="btn" style="background:#d97706; flex:0.25" onclick="document.getElementById('fIn').click()">📁</button>
-        <input type="file" id="fIn" hidden onchange="uploadFile(event)">
-        <button class="btn btn-run" id="toggle-btn" onclick="togglePreview()">▶ PREVIEW</button>
-        <button class="btn btn-save" onclick="saveNow()">☁ SAVE</button>
+        <button id="btnMenu" class="btn btn-menu">☰</button>
+        <button id="btnToggle" class="btn btn-run">▶ PREVIEW</button>
+        <button id="btnSave" class="btn btn-save">☁ SAVE</button>
     </div>
 </div>
 
 <div class="history-overlay" id="history-box">
     <div class="history-header">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-weight:bold; color:var(--accent);">MY CLOUD FILES</span>
-            <button onclick="closeHistory()" style="background:none; border:none; color:white; font-size:24px;">✕</button>
+            <span style="font-weight:bold; color:var(--accent);">MY PROJECTS</span>
+            <button id="btnCloseHistory" style="background:none; border:none; color:white; font-size:24px;">✕</button>
         </div>
-        <input type="text" id="searchInput" class="search-box" placeholder="Search by name..." oninput="filterHistory()">
+        <input type="text" id="searchInput" class="search-box" placeholder="Search project name...">
     </div>
-    <div class="history-content" id="history-items">Loading...</div>
+    <div class="history-content" id="history-items"></div>
 </div>
-
-<iframe id="viewer" style="position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:10000; display:none; border:none;"></iframe>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { getDatabase, ref, push, set, get, remove, query, limitToLast } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
     const firebaseConfig = {
@@ -100,161 +98,131 @@
     };
 
     const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
     const db = getDatabase(app);
 
+    let currentUser = null;
     let currentProjectId = null;
     let isPreview = false;
-    let allProjects = []; // Store projects for searching
 
-    // --- Helper Copy Function (With Fallback) ---
-    function performCopy(text) {
-        if (navigator.clipboard && window.isSecureContext) {
-            return navigator.clipboard.writeText(text);
+    // --- Authentication ---
+    document.getElementById('btnLogin').onclick = () => {
+        const e = document.getElementById('email').value;
+        const p = document.getElementById('password').value;
+        signInWithEmailAndPassword(auth, e, p).catch(err => alert("Error: " + err.message));
+    };
+
+    document.getElementById('btnSignup').onclick = () => {
+        const e = document.getElementById('email').value;
+        const p = document.getElementById('password').value;
+        if(p.length < 6) return alert("Password kam se kam 6 characters ka ho");
+        createUserWithEmailAndPassword(auth, e, p).catch(err => alert("Error: " + err.message));
+    };
+
+    window.logoutUser = () => signOut(auth);
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            currentUser = user;
+            document.getElementById('auth-screen').style.display = 'none';
+            document.getElementById('main-app').style.display = 'flex';
+            document.getElementById('user-email').innerText = user.email;
+            loadHistory();
         } else {
-            let textArea = document.createElement("textarea");
-            textArea.value = text;
-            textArea.style.position = "fixed"; textArea.style.left = "-9999px";
-            document.body.appendChild(textArea);
-            textArea.focus(); textArea.select();
-            return new Promise((res, rej) => {
-                document.execCommand('copy') ? res() : rej();
-                textArea.remove();
-            });
+            currentUser = null;
+            document.getElementById('auth-screen').style.display = 'flex';
+            document.getElementById('main-app').style.display = 'none';
         }
-    }
+    });
 
-    // --- History Control ---
-    window.openHistory = () => {
-        document.getElementById('history-box').style.display = 'flex';
-        loadHistory();
-    };
-    window.closeHistory = () => {
-        document.getElementById('history-box').style.display = 'none';
-        document.getElementById('searchInput').value = ""; // Clear search on close
-    };
-
-    // --- Search Logic ---
-    window.filterHistory = () => {
-        const term = document.getElementById('searchInput').value.toLowerCase();
-        const filtered = allProjects.filter(p => p.data.name.toLowerCase().includes(term));
-        renderHistory(filtered);
-    };
-
-    // --- Load History ---
-    window.loadHistory = async () => {
-        const list = document.getElementById("history-items");
-        list.innerHTML = "Loading...";
-        const snap = await get(query(ref(db, 'user_projects'), limitToLast(100)));
-        if(snap.exists()){
-            allProjects = Object.keys(snap.val()).reverse().map(key => ({ key, data: snap.val()[key] }));
-            renderHistory(allProjects);
-        } else { list.innerHTML = "No projects found."; }
-    };
-
-    function renderHistory(projects) {
-        const list = document.getElementById("history-items");
-        list.innerHTML = "";
-        projects.forEach(item => {
-            const link = window.location.origin + window.location.pathname + "?id=" + item.key;
-            const card = document.createElement("div");
-            card.className = "hist-card";
-            card.innerHTML = `
-                <div class="hist-info" onclick="openMe('${item.key}')">
-                    <b>${item.data.name || 'Untitled'}</b>
-                    <small>${item.data.time}</small>
-                </div>
-                <div class="actions">
-                    <button class="action-btn copy-btn" id="btn-${item.key}">🔗</button>
-                    <button class="action-btn del-btn" id="del-${item.key}">🗑</button>
-                </div>
-            `;
-            list.appendChild(card);
-            
-            document.getElementById(`btn-${item.key}`).onclick = (e) => {
-                e.stopPropagation();
-                performCopy(link).then(() => alert("Link Copied! 🔗"));
-            };
-            document.getElementById(`del-${item.key}`).onclick = (e) => {
-                e.stopPropagation();
-                if(confirm("Delete karein?")){
-                    remove(ref(db, 'user_projects/' + item.key));
-                    loadHistory();
-                }
-            };
-        });
-    }
-
-    // --- Logic for Save, Open, Preview ---
-    window.openMe = async (key) => {
-        const snap = await get(ref(db, 'user_projects/' + key));
-        document.getElementById('editor').value = snap.val().html;
-        currentProjectId = key;
-        if(isPreview) togglePreview();
-        closeHistory();
-    };
-
-    window.saveNow = async () => {
+    // --- Save Logic ---
+    document.getElementById('btnSave').onclick = async () => {
         const code = document.getElementById('editor').value;
         if(!code) return alert("Editor khali hai!");
+        const path = `users/${currentUser.uid}/projects`;
 
         if(currentProjectId) {
-            try {
-                const snap = await get(ref(db, 'user_projects/' + currentProjectId));
-                await set(ref(db, 'user_projects/' + currentProjectId), {
-                    name: snap.val().name, html: code, time: new Date().toLocaleString() + " (Updated)"
-                });
-                alert("Project Updated! ✅");
-                return;
-            } catch(e) { console.error(e); }
+            const snap = await get(ref(db, `${path}/${currentProjectId}`));
+            await set(ref(db, `${path}/${currentProjectId}`), {
+                name: snap.val().name, html: code, time: new Date().toLocaleString() + " (Updated)"
+            });
+            alert("Project Updated!"); return;
         }
 
         const name = prompt("Project Name:", "New Project");
         if(!name) return;
-        const newRef = push(ref(db, 'user_projects'));
+        const newRef = push(ref(db, path));
         await set(newRef, { name, html: code, time: new Date().toLocaleString() });
         currentProjectId = newRef.key;
-        const finalLink = window.location.origin + window.location.pathname + "?id=" + newRef.key;
-        document.getElementById('link-url').innerText = finalLink;
-        document.getElementById('share-status').style.display = 'block';
-        alert("Hosted Successfully!");
+        alert("Saved Successfully!");
     };
 
-    window.togglePreview = () => {
+    // --- History Logic ---
+    document.getElementById('btnMenu').onclick = () => {
+        document.getElementById('history-box').style.display = 'flex';
+        loadHistory();
+    };
+    document.getElementById('btnCloseHistory').onclick = () => document.getElementById('history-box').style.display = 'none';
+
+    async function loadHistory() {
+        const list = document.getElementById("history-items");
+        list.innerHTML = "Loading...";
+        const snap = await get(query(ref(db, `users/${currentUser.uid}/projects`), limitToLast(50)));
+        list.innerHTML = "";
+        if(snap.exists()){
+            Object.keys(snap.val()).reverse().forEach(key => {
+                const data = snap.val()[key];
+                const card = document.createElement("div");
+                card.className = "hist-card";
+                card.innerHTML = `
+                    <div style="flex:1" onclick="openProject('${key}')">
+                        <b>${data.name}</b><br><small>${data.time}</small>
+                    </div>
+                    <button style="background:none; border:none; color:#ff4757; padding:10px;" onclick="deleteProject('${key}')">🗑</button>
+                `;
+                list.appendChild(card);
+            });
+        } else { list.innerHTML = "Koi projects nahi hain."; }
+    }
+
+    window.openProject = async (key) => {
+        const snap = await get(ref(db, `users/${currentUser.uid}/projects/${key}`));
+        document.getElementById('editor').value = snap.val().html;
+        currentProjectId = key;
+        document.getElementById('history-box').style.display = 'none';
+    };
+
+    window.deleteProject = async (key) => {
+        if(confirm("Delete karein?")) {
+            await remove(ref(db, `users/${currentUser.uid}/projects/${key}`));
+            loadHistory();
+        }
+    };
+
+    // --- Preview Logic ---
+    document.getElementById('btnToggle').onclick = () => {
         const editor = document.getElementById('editor');
         const preview = document.getElementById('preview-box');
-        const btn = document.getElementById('toggle-btn');
         isPreview = !isPreview;
         if(isPreview) {
             const doc = document.getElementById('preview-frame').contentWindow.document;
             doc.open(); doc.write(editor.value); doc.close();
             editor.style.display="none"; preview.style.display="block";
-            btn.innerHTML = "📝 EDIT";
+            document.getElementById('btnToggle').innerText = "📝 EDIT";
         } else {
             editor.style.display="block"; preview.style.display="none";
-            btn.innerHTML = "▶ PREVIEW";
+            document.getElementById('btnToggle').innerText = "▶ PREVIEW";
         }
     };
 
-    window.copyCurrentLink = () => {
-        performCopy(document.getElementById('link-url').innerText).then(() => alert("Copied!"));
-    };
-
-    window.uploadFile = (e) => {
-        const reader = new FileReader();
-        reader.onload = (ev) => { document.getElementById('editor').value = ev.target.result; currentProjectId = null; };
-        reader.readAsText(e.target.files[0]);
-    };
-
-    window.onload = async () => {
-        const id = new URLSearchParams(window.location.search).get('id');
-        if(id){
-            document.getElementById('editor-ui').style.display="none";
-            const v = document.getElementById('viewer'); v.style.display="block";
-            const snap = await get(ref(db, 'user_projects/' + id));
-            if(snap.exists()){
-                const d = v.contentWindow.document; d.open(); d.write(snap.val().html); d.close();
-            }
-        }
+    // --- Search Logic ---
+    document.getElementById('searchInput').oninput = (e) => {
+        const term = e.target.value.toLowerCase();
+        const cards = document.querySelectorAll('.hist-card');
+        cards.forEach(card => {
+            const name = card.querySelector('b').innerText.toLowerCase();
+            card.style.display = name.includes(term) ? 'flex' : 'none';
+        });
     };
 </script>
 </body>
